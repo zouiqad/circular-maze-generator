@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private GameObject CreateCurvedWall(float innerRadius, float thickness, float angle, float rotation, int curvedWallSegments = 20)
+    private GameObject CreateCurvedWall(float innerRadius, float thickness, float angle, float rotation, int curvedWallSegments = 8)
     {
         GameObject curvedWallGO = new GameObject("Curved Wall");
         CurvedWall curvedWall = curvedWallGO.AddComponent<CurvedWall>();
