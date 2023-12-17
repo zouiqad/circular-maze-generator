@@ -31,6 +31,25 @@ public class MazeCell : MonoBehaviour
         leftGO = leftWall;
     }
 
+    public void SetFrontColor(Color color)
+    {
+        if (frontGO != null)
+        {
+            frontGO.GetComponent<Renderer>().material.color = color;
+            return;
+        }
+        print("Exception: null front wall GO");
+    }
+
+    public void SetLeftColor(Color color)
+    {
+        if (leftGO != null)
+        {
+            leftGO.GetComponentInChildren<Renderer>().material.color = color;
+            return;
+        }
+        print("Exception: null left wall GO");
+    }
 
     // Methods to set individual fields
     public void SetFront(bool value)

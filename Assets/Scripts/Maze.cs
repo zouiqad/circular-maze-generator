@@ -35,7 +35,8 @@ public class Maze : MonoBehaviour
 
         // Randomly choose an exit in the outermost ring
         int exitSegment = rng.Next(cells[^1].Count);
-        visited[ringsNB - 1][exitSegment] = true; // Mark the exit as visited
+        print(" EXIT : " + (ringsNB - 1) + ", " + exitSegment);
+        ColorCell((ringsNB - 1, exitSegment), Color.red);
 
         // Start the maze generation from the exit
         StartCoroutine(VisitCell(ringsNB - 1, exitSegment));
@@ -46,21 +47,29 @@ public class Maze : MonoBehaviour
     {
         visited[ring][segment] = true;
 
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0);
         // Get a list of all neighbors, shuffle it to ensure random order
         List<(int, int)> neighbors = GetUnvisitedNeighbors(ring, segment);
         Shuffle(neighbors);  // Shuffle the list
+
+        foreach(var neighbor in neighbors)
+        {
+            ColorCell(neighbor, Color.yellow);
+
+        }
 
         foreach (var neighbor in neighbors)
         {
             // Get neighbor ring and segment
             (int neighborRing, int neighborSegment) = neighbor;
 
+            ColorCell(neighbor, Color.white);
+
             // If the neighbor has not been visited
             if (!visited[neighborRing][neighborSegment])
             {
                 // Remove the wall between the current cell and the chosen cell
-                RemoveWallBetween(ring, segment, neighborRing, neighborSegment);
+                StartCoroutine(RemoveWallBetween(ring, segment, neighborRing, neighborSegment));
 
                 // Recursively visit the chosen cell
                 yield return StartCoroutine(VisitCell(neighborRing, neighborSegment));
@@ -68,10 +77,17 @@ public class Maze : MonoBehaviour
         }
     }
 
+    private void ColorCell((int, int) cell, Color color)
+    {
+        cells[cell.Item1][cell.Item2].SetFrontColor(color);
+        cells[cell.Item1][cell.Item2].SetLeftColor(color);
+
+    }
+
     private List<(int, int)> GetUnvisitedNeighbors(int ring, int segment)
     {
         List<(int, int)> neighbors = new List<(int, int)>();
-        int segmentsNB = GetSegmentCount(ring);
+        int currentRing_segmentsNB = GetSegmentCount(ring);
 
         // Add the inner and outer ring neighbors if they haven't been visited
 
@@ -79,11 +95,22 @@ public class Maze : MonoBehaviour
         if (ring < ringsNB - 2)
         {
             int outerSegmentsNB = GetSegmentCount(ring + 1);
-            int childSegment = (segmentsNB == outerSegmentsNB) ? segment % outerSegmentsNB : (segment * 2) % outerSegmentsNB;
-            if (!visited[ring + 1][childSegment])
-                neighbors.Add((ring + 1, childSegment));
-            if (!visited[ring + 1][(childSegment + 1) % outerSegmentsNB])
-                neighbors.Add((ring + 1, (childSegment + 1) % outerSegmentsNB));
+
+            if (currentRing_segmentsNB != outerSegmentsNB )
+            {
+                int childSegment = segment * 2;
+
+                if (!visited[ring + 1][childSegment])
+                    neighbors.Add((ring + 1, childSegment));
+                if (!visited[ring + 1][(childSegment + 1)])
+                    neighbors.Add((ring + 1, childSegment + 1));
+            } else
+            {
+                int childSegment = segment;
+                if (!visited[ring + 1][childSegment])
+                    neighbors.Add((ring + 1, childSegment));
+            }
+
         }
 
         // For inner ring neighbors
@@ -91,7 +118,7 @@ public class Maze : MonoBehaviour
         {
             int innerSegmentsNB = GetSegmentCount(ring - 1);
 
-            int parentSegment = (segmentsNB == innerSegmentsNB) ? segment : segment / 2;
+            int parentSegment = (currentRing_segmentsNB == innerSegmentsNB) ? segment : segment / 2; // TO FIX
 
             if (!visited[ring - 1][parentSegment])
                 neighbors.Add((ring - 1, parentSegment));
@@ -103,25 +130,22 @@ public class Maze : MonoBehaviour
         }
 
         // Add the left and right segment neighbors in the same ring if they haven't been visited
-        if(ring != ringsNB - 1)
+        if(ring != (ringsNB - 1))
         {
-            int leftSegment = (segment - 1 + segmentsNB) % segmentsNB;
+            int leftSegment = (segment - 1 + currentRing_segmentsNB) % currentRing_segmentsNB;
             if (!visited[ring][leftSegment])
                 neighbors.Add((ring, leftSegment));
 
-            int rightSegment = (segment + 1) % segmentsNB;
+            int rightSegment = (segment + 1) % currentRing_segmentsNB;
             if (!visited[ring][rightSegment])
                 neighbors.Add((ring, rightSegment));
         }
 
         return neighbors;
     }
-    private bool HasUnvisitedNeighbors(int ring, int segment)
-    {
-        return GetUnvisitedNeighbors(ring, segment).Count > 0;
-    }
 
-    private void RemoveWallBetween(int ring1, int segment1, int ring2, int segment2)
+
+    private IEnumerator RemoveWallBetween(int ring1, int segment1, int ring2, int segment2)
     {
         int segmentsNB = GetSegmentCount(ring1);
         // Get the cells at the given positions
@@ -134,10 +158,14 @@ public class Maze : MonoBehaviour
         {
             if (segment1 == (segment2 + 1) % segmentsNB) // cell2 is to the left of cell1
             {
+                cell1.SetLeftColor(Color.red);
+                yield return new WaitForSeconds(0);
                 cell1.SetLeft(false);
             }
             else if (segment2 == (segment1 + 1) % segmentsNB) // cell1 is to the left of cell2
             {
+                cell2.SetLeftColor(Color.red);
+                yield return new WaitForSeconds(0);
                 cell2.SetLeft(false);
             }
         }
@@ -146,10 +174,14 @@ public class Maze : MonoBehaviour
         {
             if (ring1 < ring2) // cell2 is outside cell1
             {
+                cell2.SetFrontColor(Color.red);
+                yield return new WaitForSeconds(0);
                 cell2.SetFront(false);
             }
             else // cell1 is outside cell2
             {
+                cell1.SetFrontColor(Color.red);
+                yield return new WaitForSeconds(0);
                 cell1.SetFront(false);
             }
         }

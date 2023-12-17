@@ -22,6 +22,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         MazeGO = new GameObject("Maze");
+        mat.color = Color.grey;
         Maze maze = MazeGO.AddComponent<Maze>();
 
         GenerateRings();
@@ -62,12 +63,9 @@ public class GameManager : MonoBehaviour
         List<MazeCell> segments = new List<MazeCell>();
         cells.Add(segments);
 
+
         // Curved wall parameters
         float innerRadius = radius * (ringsNB + 1);
-
-
-        // Create full curved wall (outer ring)
-        segmentsNB /= 2;
 
         float teta = 360.0f / segmentsNB;
         float wallRotation = 0.0f;
@@ -89,9 +87,10 @@ public class GameManager : MonoBehaviour
             wallRotation += teta;
             segments.Add(current_cell);
         }
+
     }
 
-    // Generate the first cell (the goal cell to our backtracking algorithm)
+    // Generate the first cell (the goal cell to our DFS algorithm)
     private void GenerateSpawnCell()
     {
         List<MazeCell> spawnRing = new List<MazeCell>();
@@ -115,7 +114,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 1; i < ringsNB; i++)
         {
-            GameObject ringGO = new GameObject($"Ring{i - 1}"); // parent ring GO
+            GameObject ringGO = new GameObject($"Ring{i}"); // parent ring GO
             ringGO.transform.parent = MazeGO.transform;
 
             List<MazeCell> segments = new List<MazeCell>();
@@ -127,7 +126,7 @@ public class GameManager : MonoBehaviour
             for (int j = 0; j < segmentsNB; j++)
             {
                 // Create parent gameobject that holds cell data
-                MazeCell current_cell = new GameObject($"{i - 1}, {j}").AddComponent<MazeCell>();
+                MazeCell current_cell = new GameObject($"{i}, {j}").AddComponent<MazeCell>();
 
 
                 // Curved wall parameters
