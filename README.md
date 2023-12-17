@@ -2,6 +2,8 @@
 
 Projet Github réalisé dans le cadre du cours de Mondes virtuels - Génération procédurale de Gilles Gesquiere du Master Gamagora.
 
+![Circular Maze Generator](generated_maze.png)
+
 ## Comment compiler et tester le code
 
 - Cloner le dépot git en local
@@ -19,9 +21,6 @@ L'algorithme DFS (Depth-First Search, ou Parcours en Profondeur) est utilisé da
 Dans le contexte de la génération de labyrinthes, le DFS commence à une cellule aléatoire et explore aussi loin que possible le long de chaque branche avant de revenir en arrière. Ce processus est répété jusqu'à ce que l'ensemble du labyrinthe ait été exploré. Le résultat est un labyrinthe parfait, c'est-à-dire qu'il existe un seul chemin entre deux cellules et qu'il n'y a pas de boucles.
 
 L'algorithme DFS est un choix populaire pour la génération de labyrinthes en raison de sa simplicité et du fait qu'il génère des labyrinthes avec un facteur "rivière" élevé, ce qui signifie qu'ils ont de longs couloirs sinueux.
-
-
-D'accord, je vais intégrer ces informations dans la documentation existante :
 
 ### Documentation du Projet Unity
 
@@ -72,4 +71,6 @@ Projet visant à créer un labyrinthe circulaire en utilisant Unity pour permett
 #### **Conclusion**
 
 Ce projet de génération de labyrinthe circulaire utilise des composants pour créer un labyrinthe complexe à partir de segments circulaires. L'utilisation de l'algorithme de backtracking et de la génération de maillage permet de créer un labyrinthe unique et jouable dans l'environnement Unity, notamment pour notre jeu s'inspirant du film "Le Labyrinthe" de Wes Ball.
+
+![generation_gif](labyrinthe.gif)
 
