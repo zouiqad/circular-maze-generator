@@ -13,7 +13,7 @@ public class Maze : MonoBehaviour
     private bool[][] visited;
     private System.Random rng = new System.Random();
 
-
+    private int exit;
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -35,16 +35,22 @@ public class Maze : MonoBehaviour
 
         // Randomly choose an exit in the outermost ring
         int exitSegment = rng.Next(cells[^1].Count);
+        exit = exitSegment;
         print(" EXIT : " + (ringsNB - 1) + ", " + exitSegment);
         ColorCell((ringsNB - 1, exitSegment), Color.red);
 
         // Start the maze generation from the exit
         StartCoroutine(VisitCell(ringsNB - 1, exitSegment));
 
+
+
     }
 
+    private int activeCoroutines = 0;
     private IEnumerator VisitCell(int ring, int segment)
     {
+        activeCoroutines++;
+
         visited[ring][segment] = true;
 
         yield return new WaitForSeconds(0);
@@ -75,6 +81,19 @@ public class Maze : MonoBehaviour
                 yield return StartCoroutine(VisitCell(neighborRing, neighborSegment));
             }
         }
+        activeCoroutines--;
+        // If this was the last active coroutine, call the completion method
+        if (activeCoroutines == 0)
+        {
+            CoroutineComplete();
+        }
+    }
+
+    private void CoroutineComplete()
+    {
+        // This method is called when all coroutines finish execution
+        Debug.Log("All instances of the recursive coroutine have completed.");
+        
     }
 
     private void ColorCell((int, int) cell, Color color)
@@ -143,6 +162,87 @@ public class Maze : MonoBehaviour
 
         return neighbors;
     }
+
+    public bool FindPathToCenter(int exitSegment)
+    {
+        // Assuming exit is at the outermost ring
+        var start = (ringsNB - 1, exitSegment);
+
+        Queue<(int, int)> queue = new Queue<(int, int)>();
+        queue.Enqueue(start);
+
+        visited = new bool[ringsNB][];
+        for (int i = 0; i < ringsNB; i++)
+        {
+            visited[i] = new bool[GetSegmentCount(i)];
+        }
+        visited[start.Item1][start.Item2] = true;
+
+        while (queue.Count > 0)
+        {
+            (int ring, int segment) = queue.Dequeue();
+
+            // If we have reached the center ring
+            if (ring == 0)
+            {
+                return true; // Path to the center has been found
+            }
+
+
+            List<(int, int)> neighbors = GetUnvisitedNeighbors(ring, segment);
+
+            foreach (var neighbor in neighbors)
+            {
+
+                if (IsPathOpen(ring, segment, neighbor.Item1, neighbor.Item2))
+                {
+                    visited[neighbor.Item1][neighbor.Item2] = true;
+                    queue.Enqueue(neighbor);
+                }
+            }
+        }
+
+        return false; // No path to the center found
+    }
+
+    private bool IsPathOpen(int ring1, int segment1, int ring2, int segment2)
+    {
+        int segmentsNB = GetSegmentCount(ring1);
+        // Get the cells at the given positions
+        MazeCell cell1 = cells[ring1][segment1].GetComponent<MazeCell>();
+        MazeCell cell2 = cells[ring2][segment2].GetComponent<MazeCell>();
+
+        // Determine the position and remove the appropriate walls
+        // If they are in the same ring:
+        if (ring1 == ring2 && ring1 != ringsNB - 1)
+        {
+            if (segment1 == (segment2 + 1) % segmentsNB) // cell2 is to the left of cell1
+            {
+                return cell1.leftGO.activeSelf;
+
+            }
+            else if (segment2 == (segment1 + 1) % segmentsNB) // cell1 is to the left of cell2
+            {
+                return cell2.leftGO.activeSelf;
+
+            }
+        }
+        // If they are in adjacent rings:
+        else
+        {
+            if (ring1 < ring2) // cell2 is outside cell1
+            {
+                return cell2.frontGO.activeSelf;
+
+            }
+            else // cell1 is outside cell2
+            {
+                return cell1.frontGO.activeSelf;
+            }
+        }
+        return false;
+    }
+
 
 
     private IEnumerator RemoveWallBetween(int ring1, int segment1, int ring2, int segment2)

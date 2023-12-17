@@ -5,8 +5,8 @@ using UnityEngine;
 public class MazeCell : MonoBehaviour
 {
 
-    [SerializeField] private GameObject frontGO;
-    [SerializeField] private GameObject leftGO;
+    public GameObject frontGO;
+    public GameObject leftGO;
 
     private float _x;
     private float _z;
