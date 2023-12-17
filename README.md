@@ -3,7 +3,7 @@
 Projet Github réalisé dans le cadre du cours de Mondes virtuels - Génération procédurale de Gilles Gesquiere du Master Gamagora.
 
 ![Circular Maze Generator](generated_maze.png)
-
+![Circular Maze Gif](circular-maze-animation.gif)
 ## Comment compiler et tester le code
 
 - Cloner le dépot git en local

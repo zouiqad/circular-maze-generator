@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject leftWallModel;
     [SerializeField] private Material mat;
     [SerializeField] private float segmentDistanceThreshold;
+    [SerializeField] private float animationDelay = 0.5f;
 
 
     private GameObject MazeGO;
@@ -24,7 +25,7 @@ public class GameManager : MonoBehaviour
         MazeGO = new GameObject("Maze");
         mat.color = Color.grey;
         Maze maze = MazeGO.AddComponent<Maze>();
-
+        maze.delay = animationDelay;
         GenerateRings();
         maze.GenerateMazePaths(cells);
 

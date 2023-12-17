@@ -4,6 +4,8 @@ using System.Collections;
 
 public class Maze : MonoBehaviour
 {
+    // Parameters to control animation
+    public float delay = 0.5f;
     // Reference of game manager and cell data structure
     private GameManager gameManager;
     private List<List<MazeCell>> cells;
@@ -53,12 +55,13 @@ public class Maze : MonoBehaviour
 
         visited[ring][segment] = true;
 
-        yield return new WaitForSeconds(0);
+
         // Get a list of all neighbors, shuffle it to ensure random order
         List<(int, int)> neighbors = GetUnvisitedNeighbors(ring, segment);
         Shuffle(neighbors);  // Shuffle the list
 
-        foreach(var neighbor in neighbors)
+        yield return new WaitForSeconds(delay);
+        foreach (var neighbor in neighbors)
         {
             ColorCell(neighbor, Color.yellow);
 
@@ -259,13 +262,13 @@ public class Maze : MonoBehaviour
             if (segment1 == (segment2 + 1) % segmentsNB) // cell2 is to the left of cell1
             {
                 cell1.SetLeftColor(Color.red);
-                yield return new WaitForSeconds(0);
+                yield return new WaitForSeconds(delay);
                 cell1.SetLeft(false);
             }
             else if (segment2 == (segment1 + 1) % segmentsNB) // cell1 is to the left of cell2
             {
                 cell2.SetLeftColor(Color.red);
-                yield return new WaitForSeconds(0);
+                yield return new WaitForSeconds(delay);
                 cell2.SetLeft(false);
             }
         }
@@ -275,13 +278,13 @@ public class Maze : MonoBehaviour
             if (ring1 < ring2) // cell2 is outside cell1
             {
                 cell2.SetFrontColor(Color.red);
-                yield return new WaitForSeconds(0);
+                yield return new WaitForSeconds(delay);
                 cell2.SetFront(false);
             }
             else // cell1 is outside cell2
             {
                 cell1.SetFrontColor(Color.red);
-                yield return new WaitForSeconds(0);
+                yield return new WaitForSeconds(delay);
                 cell1.SetFront(false);
             }
         }
