@@ -38,14 +38,15 @@ public class Maze : MonoBehaviour
         visited[ringsNB - 1][exitSegment] = true; // Mark the exit as visited
 
         // Start the maze generation from the exit
-        VisitCell(ringsNB - 1, exitSegment);
+        StartCoroutine(VisitCell(ringsNB - 1, exitSegment));
 
     }
 
-    private void VisitCell(int ring, int segment)
+    private IEnumerator VisitCell(int ring, int segment)
     {
         visited[ring][segment] = true;
-        ;
+
+        yield return new WaitForSeconds(0.1f);
         // Get a list of all neighbors, shuffle it to ensure random order
         List<(int, int)> neighbors = GetUnvisitedNeighbors(ring, segment);
         Shuffle(neighbors);  // Shuffle the list
@@ -62,7 +63,7 @@ public class Maze : MonoBehaviour
                 RemoveWallBetween(ring, segment, neighborRing, neighborSegment);
 
                 // Recursively visit the chosen cell
-                VisitCell(neighborRing, neighborSegment);
+                yield return StartCoroutine(VisitCell(neighborRing, neighborSegment));
             }
         }
     }

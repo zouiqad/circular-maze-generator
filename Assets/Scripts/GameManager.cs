@@ -14,7 +14,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int ringsNB = 3;
     [SerializeField] private GameObject leftWallModel;
     [SerializeField] private Material mat;
-    [SerializeField] private Maze maze;
     [SerializeField] private float segmentDistanceThreshold;
 
 
@@ -23,22 +22,22 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         MazeGO = new GameObject("Maze");
+        Maze maze = MazeGO.AddComponent<Maze>();
 
         GenerateRings();
         maze.GenerateMazePaths(cells);
 
-        MazeGO.transform.position += 4.0f * Vector3.down;
     }
 
 
-    private GameObject CreateCurvedWall(float innerRadius, float outerRadius, float angle, int curvedWallSegments = 20)
+    private GameObject CreateCurvedWall(float innerRadius, float thickness, float angle, float rotation, int curvedWallSegments = 20)
     {
-        GameObject wallObject = new GameObject("Curved Wall");
-        CurvedWall curvedWall = wallObject.AddComponent<CurvedWall>();
+        GameObject curvedWallGO = new GameObject("Curved Wall");
+        CurvedWall curvedWall = curvedWallGO.AddComponent<CurvedWall>();
 
         // Set your parameters here
         curvedWall.InnerRadius = innerRadius;
-        curvedWall.OuterRadius = outerRadius;
+        curvedWall.OuterRadius = innerRadius + thickness;
         curvedWall.Angle = angle;
         curvedWall.WallHeight = curvedWallHeight;
         curvedWall.Segments = curvedWallSegments;
@@ -48,7 +47,12 @@ public class GameManager : MonoBehaviour
         // Assign the material to the curved wall
         curvedWall.GetComponent<MeshRenderer>().material = mat;
 
-        return wallObject;
+        curvedWallGO.transform.Rotate(new Vector3(0.0f, rotation, 0.0f));
+        curvedWallGO.transform.position = Vector3.zero;
+
+
+
+        return curvedWallGO;
     }
 
     private void DrawOuterRing()
@@ -60,7 +64,6 @@ public class GameManager : MonoBehaviour
 
         // Curved wall parameters
         float innerRadius = radius * (ringsNB + 1);
-        float outerRadius = innerRadius + thickness;
 
 
         // Create full curved wall (outer ring)
@@ -74,28 +77,28 @@ public class GameManager : MonoBehaviour
             MazeCell current_cell = new GameObject($"{ringsNB - 1}, {j}").AddComponent<MazeCell>();
 
             // Create curved wall
-            GameObject curvedWall = CreateCurvedWall(innerRadius, outerRadius, teta);
+            GameObject curvedWall = CreateCurvedWall(innerRadius, thickness, teta, wallRotation);
 
-            curvedWall.transform.rotation = Quaternion.Euler(0.0f, wallRotation + curvedWall.transform.rotation.eulerAngles.y, 0.0f);
-            curvedWall.transform.position = Vector3.zero;
 
-            wallRotation += teta;
+
+            // Set the parent transform and set wall data
             curvedWall.transform.parent = current_cell.transform;
             current_cell.transform.parent = ringGO.transform;
             current_cell.SetWallsGO(curvedWall, null);
-            
 
+            wallRotation += teta;
             segments.Add(current_cell);
         }
     }
 
-    // Generate the cell where the player spawns (the goal cell to our backtracking algorithm)
+    // Generate the first cell (the goal cell to our backtracking algorithm)
     private void GenerateSpawnCell()
     {
         List<MazeCell> spawnRing = new List<MazeCell>();
 
         MazeCell spawnCell = new GameObject("Spawn cell").AddComponent<MazeCell>();
 
+        spawnCell.transform.parent = MazeGO.transform;
 
         spawnCell.SetWallsGO(null, null);
         spawnRing.Add(spawnCell);
@@ -129,20 +132,20 @@ public class GameManager : MonoBehaviour
 
                 // Curved wall parameters
                 float innerRadius = radius * (i + 1);
-                float outerRadius = innerRadius + thickness;
 
                 // Create curved wall
-                GameObject curvedWall = CreateCurvedWall(innerRadius, outerRadius, teta);
+                GameObject curvedWall = CreateCurvedWall(innerRadius, thickness, teta, wallRotation);
 
-                curvedWall.transform.rotation = Quaternion.Euler(0.0f, wallRotation + curvedWall.transform.rotation.eulerAngles.y, 0.0f);
-                curvedWall.transform.position = Vector3.zero;
+
 
 
                 // Create Left wall
                 Quaternion orientation = Quaternion.Euler(new Vector3(0.0f, -90.0f + wallRotation, 0.0f));
                 Vector3 pos = orientation * new Vector3(radius * (i + 1), 0, 0);
                 GameObject leftWall = Instantiate(leftWallModel, pos, orientation);
-                leftWall.transform.localScale = new Vector3(radius, curvedWallHeight, 0.5f); // scale left wall
+                
+                leftWall.transform.localScale = new Vector3(radius + thickness, curvedWallHeight, thickness); // scale left wall
+                leftWall.GetComponentInChildren<Renderer>().material = mat; // set left wall material
                 leftWall.name = "Left Wall";
 
                 current_cell.Init(ringGO, x: pos.x, z: pos.z);
@@ -160,10 +163,7 @@ public class GameManager : MonoBehaviour
             // Since our rings get bigger we need to double segments count, but first check if 
             // not segments not too close to each others
             if (Mathf.Abs(Mathf.Tan(360.0f / (segmentsNB * 2))) > segmentDistanceThreshold)
-            {
                 segmentsNB *= 2; 
-
-            }
         }
 
         DrawOuterRing();
