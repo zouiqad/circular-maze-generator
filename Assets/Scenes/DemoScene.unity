@@ -254,7 +254,7 @@ MonoBehaviour:
   leftWallModel: {fileID: 3937241985000087594, guid: 4e8602ab9a290644a850a37d6b06b474, type: 3}
   mat: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   segmentDistanceThreshold: 0.5
-  delay: 0.001
+  animationDelay: 0.001
 --- !u!4 &906625522
 Transform:
   m_ObjectHideFlags: 0

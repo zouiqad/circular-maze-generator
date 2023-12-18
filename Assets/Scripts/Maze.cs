@@ -126,11 +126,17 @@ public class Maze : MonoBehaviour
                     neighbors.Add((ring + 1, childSegment));
                 if (!visited[ring + 1][(childSegment + 1)])
                     neighbors.Add((ring + 1, childSegment + 1));
-            } else
+            } else if (ring != 0)
             {
                 int childSegment = segment;
                 if (!visited[ring + 1][childSegment])
                     neighbors.Add((ring + 1, childSegment));
+            } else
+            {
+                for(int i = 0; i < outerSegmentsNB; i++)
+                {
+                    neighbors.Add((ring + 1, i));
+                }
             }
 
         }
