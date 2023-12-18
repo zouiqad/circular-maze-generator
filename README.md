@@ -2,8 +2,15 @@
 
 Projet Github réalisé dans le cadre du cours de Mondes virtuels - Génération procédurale de Gilles Gesquiere du Master Gamagora.
 
-![Circular Maze Generator](generated_maze.png)
-![Circular Maze Gif](circular-maze-animation.gif)
+
+<p align="center">
+  <img src="./generated_maze.png" />
+</p>
+
+<p align="center">
+  <img src="./circular-maze-animation.gif" />
+</p>
+
 ## Comment compiler et tester le code
 
 - Cloner le dépot git en local
@@ -68,9 +75,12 @@ Projet visant à créer un labyrinthe circulaire en utilisant Unity pour permett
 6. Chaque cellule contient un mur à gauche et un mur courbé.
 7. Le nombre de cellules par anneau dépend du nombre de segments de l'anneau, chaque anneau étant segmenté en plusieurs parties (paramètres utilisateur).
 
-#### **Conclusion**
+
+
+## **Conclusion**
 
 Ce projet de génération de labyrinthe circulaire utilise des composants pour créer un labyrinthe complexe à partir de segments circulaires. L'utilisation de l'algorithme de backtracking et de la génération de maillage permet de créer un labyrinthe unique et jouable dans l'environnement Unity, notamment pour notre jeu s'inspirant du film "Le Labyrinthe" de Wes Ball.
 
-![generation_gif](labyrinthe.gif)
-
+<p align="center">
+  <img src="./labyrinthe.gif" />
+</p>
